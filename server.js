@@ -2,13 +2,14 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");      //body parser for parsing strings entered by user
-const ejs = require("ejs");
+const ejs = require('ejs');
 
 const app = express();
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
+
+app.use(bodyParser.urlencoded({extended: true}));
 
 mongoose.connect("mongodb+srv://admin:madhav123456@entries.g7rqhn7.mongodb.net/")
 .then(() => {
@@ -23,7 +24,7 @@ const userSchema = {
     content: String
 }
 
-const info = mongoose.model("Information", userSchema);
+const Information = mongoose.model("Information", userSchema);
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname + "/homepage.html"));
@@ -34,7 +35,7 @@ app.get("/entries", (req, res) => {
 });
 
 app.post("/entries", (req, res) => {
-    const newInfo = new info({
+    const newInfo = new Information({
         date: req.body.date,
         title: req.body.title,
         content: req.body.content
@@ -44,34 +45,45 @@ app.post("/entries", (req, res) => {
 })
 
 app.get("/display", (req, res) => {
-    res.sendFile(path.join(__dirname + "/display.html"))
+    res.sendFile(path.join(__dirname + "/display.html"));
 })
 
-app.get("/display/:title", (req, res) => {
-    const t = req.params.title;
-    info.findById({_id: t}).then((err, entry) => {
-        if (err) {
-            res.json(err);
-        }
-        else {
-            res.render('output', {
-                title: entry.title,
-                content: entry.content
-            })
-        }
+app.post("/results", (req, res) => {
+    const t = req.body.title;
+    Information.findOne({title: t}).then(entry => {
+        res.render('output', {
+            title: entry.title,
+            content: entry.content
+        });
+    }).catch((err) => {
+        res.send("Entry not found. Please try again.");
     })
 })
 
-app.get("/all_entries", (req, res) => {
-    info.find().then((err, allInfo) => {
-        if (err) {
-            res.json(err);
-        }
-        else {
-            res.render('all', {
-                users: allInfo
-            });
-        }
+app.get('/all', (req, res) => {
+    Information.find({}).then(allInfo => {
+        res.render('all', {
+            users: allInfo
+        })
+    });
+});
+
+app.get("/deleteOne", (req, res) => {
+    res.sendFile(path.join(__dirname + "/deleteSp.html"));
+})
+
+app.post("/entrydeleted", (req, res) => {
+    const t = req.body.title;
+    Information.findOneAndDelete({title: t}).then(entry => {
+        res.render('deleteOne');
+    }).catch((err) => {
+        res.send("Entry not found/already deleted. Please try again.");
+    })
+})
+
+app.get('/deleted', (req, res) => {
+    info.deleteMany({}).then((err, result) => {
+        res.render('deleted');
     });
 });
 
