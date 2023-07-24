@@ -68,6 +68,20 @@ app.get('/all', (req, res) => {
     });
 });
 
+app.get("/update", (req, res) => {
+    res.sendFile(path.join(__dirname + "/update.html"));
+})
+
+app.post("/entryupdated", (req, res) => {
+    const t = req.body.title;
+    const up = req.body.content;
+    Information.findOneAndUpdate({title: t}, {content: up}, {new: true}).then(() => {
+        res.render('updated');
+    }).catch((err) => {
+        res.send("Entry not found/already updated. Please try again.");
+    })
+})
+
 app.get("/deleteOne", (req, res) => {
     res.sendFile(path.join(__dirname + "/deleteSp.html"));
 })
@@ -82,7 +96,7 @@ app.post("/entrydeleted", (req, res) => {
 })
 
 app.get('/deleted', (req, res) => {
-    info.deleteMany({}).then((err, result) => {
+    Information.deleteMany({}).then((err, result) => {
         res.render('deleted');
     });
 });
