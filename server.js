@@ -65,6 +65,8 @@ app.get('/all', (req, res) => {
         res.render('all', {
             users: allInfo
         })
+    }).catch((err) => {
+        res.send("Your diary is empty at the moment. Please make an entry in order to view.");
     });
 });
 
