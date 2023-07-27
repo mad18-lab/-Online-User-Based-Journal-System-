@@ -11,6 +11,10 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.listen(2501, () => {
+    console.log("Server is on");
+});
+
 mongoose.connect("mongodb+srv://admin:madhav123456@entries.g7rqhn7.mongodb.net/")
 .then(() => {
     console.log("Database is connected");
@@ -52,11 +56,28 @@ app.post("/results", (req, res) => {
     const t = req.body.title;
     Information.findOne({title: t}).then(entry => {
         res.render('output', {
+            date: entry.date,
             title: entry.title,
             content: entry.content
         });
     }).catch((err) => {
         res.send("Entry not found. Please try again.");
+    })
+})
+
+app.get("/displayDate", (req, res) => {
+    res.sendFile(__dirname + "/displayDate.html");
+})
+
+app.post("/dateEntry", (req, res) => {
+    const d = req.body.date;
+    Information.find({date: d}).then(entry => {
+        res.render('dateOutput', {
+            users: entry
+        });
+    }).catch((err) => {
+        res.send("Entry not found. Please try again.");
+        console.log(err);
     })
 })
 
@@ -91,18 +112,30 @@ app.get("/deleteOne", (req, res) => {
 app.post("/entrydeleted", (req, res) => {
     const t = req.body.title;
     Information.findOneAndDelete({title: t}).then(entry => {
-        res.render('deleteOne');
+        res.render('deleteOne', {
+            users: entry
+        });
     }).catch((err) => {
         res.send("Entry not found/already deleted. Please try again.");
     })
 })
 
+app.get("/deletedate", (req, res) => {
+    res.sendFile(path.join(__dirname + "/deleteDate.html"));
+})
+
+app.post("/datedeleted", (req, res) => {
+    const d = req.body.date;
+    Information.findOneAndDelete({date: d}).then(entry => {
+        res.render('deleteOne');
+    }).catch((err) => {
+        res.send("Entry not found/already deleted. Please try again.");
+        console.log(err);
+    })
+})
+
 app.get('/deleted', (req, res) => {
-    Information.deleteMany({}).then((err, result) => {
+    Information.deleteMany({}).then(() => {
         res.render('deleted');
     });
-});
-
-app.listen(2501, () => {
-    console.log("Server is on");
 });
