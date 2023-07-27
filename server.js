@@ -112,9 +112,7 @@ app.get("/deleteOne", (req, res) => {
 app.post("/entrydeleted", (req, res) => {
     const t = req.body.title;
     Information.findOneAndDelete({title: t}).then(entry => {
-        res.render('deleteOne', {
-            users: entry
-        });
+        res.render('deleteOne');
     }).catch((err) => {
         res.send("Entry not found/already deleted. Please try again.");
     })
