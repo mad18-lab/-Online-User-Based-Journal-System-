@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>
+            Delete Your Entry By Date
+        </title>
+    </head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <body>
+        <h1 align="center"> Delete A Specific Entry Here </h1> <hr>
+        <div class="container">
+            <form class="container" method="post" action="/datedeleted">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="date" placeholder="Enter the date of entry you want to delete" />
+                </div>
+                <button type="submit"> Delete Entry </button>
+            </form>
+        </div>
+        <a href="/all">Cannot remember the date? Click here to access all entries and see which one you want to delete</a>
+    </body>
+</html>
