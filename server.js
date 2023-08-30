@@ -13,13 +13,52 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.listen(2501, () => {
     console.log("Server is on");
-});
+})
 
 mongoose.connect("mongodb+srv://admin:madhav123456@entries.g7rqhn7.mongodb.net/")
 .then(() => {
     console.log("Database is connected");
 }).catch((error) => {
     console.log(error);
+})
+
+const loginSchema = {
+    name: String,
+    password: String
+}
+
+const LogIn = mongoose.model("LogIn", loginSchema)
+
+app.get("/", (req, res) => {
+    res.render('login');
+})
+
+app.get("/signup", (req, res) => {
+    res.render('signup');
+})
+
+app.post("/signup", async(req, res) => {
+    const userPass = new LogIn({
+        name: req.body.name,
+        password: req.body.password
+    })
+    userPass.save();
+    res.redirect("/home");
+})
+
+app.post("/", async(req, res) => {
+    const n = req.body.name
+    LogIn.findOne({name: n}).then(entry => {
+        const p = req.body.password
+        if (entry.password === p) {
+            res.redirect("/home")
+        }
+        else {
+            res.render('wrongpass')
+        }
+    }).catch(() => {
+        res.render('newuser')
+    })
 })
 
 const userSchema = {
@@ -30,7 +69,7 @@ const userSchema = {
 
 const Information = mongoose.model("Information", userSchema);
 
-app.get("/", (req, res) => {
+app.get("/home", (req, res) => {
     res.sendFile(path.join(__dirname + "/homepage.html"));
 });
 
@@ -45,7 +84,7 @@ app.post("/entries", (req, res) => {
         content: req.body.content
     })
     newInfo.save();
-    res.redirect("/");
+    res.redirect("/home");
 })
 
 app.get("/display", (req, res) => {
